@@ -20,7 +20,8 @@
 <div class="container-fluid table-responsive">
     <input class="form-control" id="hayokInput" type="text" placeholder="Search..">
     <br>
-    <table class="table table-zebra table-hover">
+    <!--Table showing patient information-->
+    <table class="table table-striped table-hover">
       <thead>
         <tr>
           <th>Image</th>
@@ -54,7 +55,7 @@
 
 </div>
 
-<!--start of add patients dialog-->
+<!--start of form to allow entering of patient's data-->
 
 
 <div class="modal" id="hayokaddpatient">

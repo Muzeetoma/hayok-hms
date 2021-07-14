@@ -30,7 +30,6 @@
     *{
         padding: 0;
         margin: 0;
-       
     }
 .body{
     height:100%;
@@ -41,10 +40,6 @@
 }
 a{
     color:black;
-}
-a:hover{
-    color:black;
-    text-decoration: none;
 }
 .h-500{
     height: 1000px;
@@ -57,45 +52,13 @@ a:hover{
 
 <div class="bg-light p-0">
 
-<div class="row">
-
-<!--vertical menu bar-->
-<div class="col-2 h-500">
-
-<h3 class="p-3 font-weight-bolder">Hayok</h3>
-<nav class="navbar">
-
-  <!-- Links -->
-  <ul class="navbar-nav">
-    <li class="nav-item">
-     <a class="nav-link font-18" href="{{ route('healthworker') }}"> <span class="la la-home mr-1"></span> Dashboard</a>
-    </li>
-    <br>
-    <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_patients') }}"> <span class="la la-users mr-1"></span> Patients</a>
-    </li>
-    <br>
-    <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_encounter') }}"> <span class="la la-user-edit mr-1"></span> Encounter</a>
-    </li>
-    <br>
-    <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_chat') }}"> <span class="la la-phone mr-1"></span> Chat</a>
-    </li>
-  </ul>
-
-</nav>
-</div>
-
-<div class="col-10" style="background-color: white;">
 
 
 <main class="">
         @include('alerts.messages')
         @yield('content')
         </main>
-</div>
-</div>
+
 </div>
 
     </div>
