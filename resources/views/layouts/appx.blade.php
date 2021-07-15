@@ -23,10 +23,6 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/w3.css') }}" rel="stylesheet">
 
-
-
-    <link href="{{asset('assets/css/components.min.css')}}" rel="stylesheet" type="text/css">		
-	<script type="text/javascript" src="{{asset('assets/js/echarts.min.js')}}"></script>
 </head>
 <body>
 
@@ -73,19 +69,12 @@ a:hover{
   <!-- Links -->
   <ul class="navbar-nav">
     <li class="nav-item">
-     <a class="nav-link font-18" href="{{ route('healthworker') }}"> <span class="la la-home mr-1"></span> Dashboard</a>
+     <a class="nav-link font-18" href="{{ route('patient') }}"> <span class="la la-home mr-2"></span>My profile</a>
     </li>
     <br>
+
     <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_patients') }}"> <span class="la la-users mr-1"></span> Patients</a>
-    </li>
-    <br>
-    <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_encounter') }}"> <span class="la la-user-edit mr-1"></span> Encounter</a>
-    </li>
-    <br>
-    <li class="nav-item">
-        <a class="nav-link font-18" href="{{ route('hw_chat') }}"> <span class="la la-phone mr-1"></span> Chat</a>
+        <a class="nav-link font-18" href="{{ route('patient-chat') }}"> <span class="la la-phone mr-2"></span> Chat</a>
     </li>
     <br>
     <li class="nav-item">

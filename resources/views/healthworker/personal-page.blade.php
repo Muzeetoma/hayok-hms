@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-4">
             
-            <h3><a href="{{ url()->previous() }}"><span class="la la-arrow-left"></span></a>
+            <h3><a href="/healthworker/encounter"><span class="la la-arrow-left"></span></a>
             <span class="ml-3">{{$patient->name}} {{$patient->surname}}</span></h3>
             <span class="text-secondary ml-5 small">View, add and forward {{$patient->name}}'s personal records </span>  
             </div>
@@ -20,11 +20,11 @@
         </div>
     
     </div>
-     <!--view of the personal records-->
+     <!--view of the personal encounter records-->
     <div class="container my-4">
 
 
-       @foreach($encounters as $encounter)
+       @forelse($encounters as $encounter)
        <div class="container p-3 my-5 rounded-lg bg-light border">
            <!--encounter header-->
            <div class="row">
@@ -92,6 +92,7 @@
                   </div>
                </div>
            </div>
+           <!--button to forward patient's record-->
            <div class="container-fluid text-right mt-2">
            <button class="btn btn-success px-2 py-0" data-toggle="collapse" data-target="#demo-{{$encounter->id}}"><span class="small">forward</span> <span class="la la-arrow-right"></span></button>
            </div>
@@ -125,13 +126,20 @@
 
        </div> 
 
+       @empty
+       <div class="container">
+        <center>
+          <h4 class="p-3 border">NO RECORD EXISTS</h4>
+        </center>
+        </div>
 
-       @endforeach
+
+       @endforelse
 
 
 
         <!--Button to add encounter for a specific patient-->
-        <button class="btn btn-success p-3"  data-toggle="modal" data-target="#hayokaddencounter" style="position:fixed;bottom:55px;right:55px;">
+        <button class="btn btn-primary p-3 rounded-circle shadow"  data-toggle="modal" data-target="#hayokaddencounter" style="position:fixed;bottom:55px;right:55px;">
             <span class="la la-pencil" style="font-size: 30px;"></span>
             </button>
     </div>
@@ -259,4 +267,8 @@
           </div>
         </div>
       </div>
+
+      <div class="d-flex justify-content-center">
+        {!! $encounters->links() !!}
+    </div>
 @endsection

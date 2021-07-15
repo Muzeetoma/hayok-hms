@@ -9,13 +9,53 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Encounter;
 use App\Models\EncounterTransfer;
+use App\Models\Chat;
 
 class HealthController extends Controller
 {
     //dashboard page
     public function index()
     {
-        return view('healthworker/dashboard');
+
+        //get gender aggregation
+        $agg_genders = User::select('gender', DB::raw('count(*) as total'))
+                            ->where('role','=','patient')
+                            ->groupby('gender')
+                            ->get();
+
+        //get age aggregation
+        $agg_ages = User::select('age', DB::raw('count(*) as total'))
+        ->where('role','=','patient')
+        ->groupby('age')
+        ->get();
+
+        $genderPoints = [];
+        $agePoints = [];
+
+        foreach($agg_genders as $agg_gender){
+
+            $genderPoints[] = array(
+                "name" => $agg_gender['gender'],
+                "value" => $agg_gender['total'],
+            );
+        }
+        
+        
+        foreach($agg_ages as $agg_age){
+
+            $agePoints[] = array(
+                "name" => $agg_age['age'],
+                "value" => $agg_age['total']
+            );
+        }
+
+        //get patients
+        $patients = User::where('role','=','patient')->get();
+
+        return view('healthworker/dashboard', [ 'gender_data' => json_encode($genderPoints), 'gender_terms' => json_encode(array(
+            "Male","Female"
+        )), 'age_data' => json_encode($agePoints), 'age_terms' => json_encode($agePoints), 'patients' => $patients
+        ]);
     }
 
     
@@ -30,37 +70,59 @@ class HealthController extends Controller
     //page to show all,sent and received encounters
     public function encounter()
     {
+        //show all patients regardless so the logged in user can select any patient to record an ecounter
         $patients = User::where('role','=','patient')->get();
 
         /*object showing distinct encounters represented by user's name,age and date the encounter was created
           this object is ordered by most recent dates
+          all records are those that were recorded by the logged in healthworker
         */
         $distinctEncounters = Encounter::Join('users', 'encounters.p_id', '=', 'users.id')
+                                        ->where('encounters.u_id','=', Auth::id())
                                         ->groupBy('encounters.p_id')
                                         ->orderBy('encounters.created_at','DESC')
                                         ->distinct()
                                         ->get();
+        
+        //object to show received encounters to the logged in healthworker orderd by recents
+        $receivedEncounters = EncounterTransfer::join('encounters', 'encounter_transfers.e_id', '=','encounters.id')
+                                                ->join('users', 'encounters.p_id', '=','users.id')
+                                                ->where('encounter_transfers.r_id','=', Auth::id())
+                                                ->orderBy('encounter_transfers.created_at','DESC')
+                                                ->get();
+        //extract the sender ids and add to senderNames array  
+        $receivedFrom = null;
+         
+        $senderNames = array();
+         //loop across each sender name and add to the sendernames array 
+        foreach($receivedEncounters as $receivedEncounter){
+            $receivedFrom = User::find($receivedEncounter->s_id);
+            array_push($senderNames,$receivedFrom->name.' '.$receivedFrom->surname);
+          
+        }
 
-        return view('healthworker/encounter', ['patients' => $patients, 'distinctEncounters' => $distinctEncounters]);
+        return view('healthworker/encounter', ['patients' => $patients, 'senderNames' => $senderNames, 'receivedEncounters' => $receivedEncounters, 'distinctEncounters' => $distinctEncounters]);
     }
      
     /*page to show individual patient's encounters
-    $uid is a variable  representining the patient's id and it is gotten from a GET request
+    $uid is a variable  representing the patient's id and it is gotten from a GET request
     */
     public function encounterPage($uid){
 
         $patient = User::find($uid);
 
-        //object carrying all encounter fields relating to a particular user
-        $encounters =  Encounter::where('p_id', $uid)->get();
+        //object carrying all encounter fields relating to a particular patient and recorded by the logged in healthworker
+        $encounters =  Encounter::where('p_id', $uid)
+                                 ->where('u_id', Auth::id())
+                                 ->paginate(3);
 
         //object carrying healthworker's info except current user
         $otherHealthWorkers = User::where('id','!=',Auth::id())
                                     ->where('role','=','healthworker')
                                     ->get();
 
-        //object to show sent healthworker's info
-                                    
+       
+
 
         return view('healthworker/personal-page', ['patient' => $patient, 'encounters' => $encounters, 'otherHealthWorkers'=> $otherHealthWorkers]);
     }
@@ -70,7 +132,7 @@ class HealthController extends Controller
     {
 
 
-        $patients = User::where('role','=','patient')->get();
+        $patients = User::where('role','=','patient')->paginate(4);
 
         return view('healthworker/patients', ['patients' => $patients]);
     }
@@ -221,16 +283,75 @@ class HealthController extends Controller
           $patients = User::where('role','=','patient')->get();
 
         if($patient->save())
-            return redirect()->route('hw_patients')->with('success', 'Carpart added Successfully!');
+            return redirect()->route('hw_patients')->with('success', 'Details added Successfully!');
           
         
         
         }
 
 
-    public function chat()
+    public function chatPage()
     {
-        return view('healthworker/chat');
+
+        $patients = User::where('role','=','patient')->get();
+
+        return view('healthworker/chat', ['patients' => $patients]);
+    }
+
+    //healthworker to chat with a particular patient
+    public function chatPatient($pid){
+
+
+        $patient = User::find($pid);
+
+        //object that carries the messages that the logged in healthworker sends
+        $sentChats = Chat::select('message as sent_message', 'created_at')
+                                  ->where('send_id','=', Auth::id())
+                                  ->where('rec_id','=',$pid)->get();
+
+        //object that carries the messages that the logged in healthworker recvieves for that particular patient
+        $receivedChats = Chat::select('message as rec_message', 'created_at')
+                                  ->where('send_id','=', $pid)
+                                  ->where('rec_id','=', Auth::id())->get();
+
+
+                                             
+        //merge the objects
+        $allItems = new \Illuminate\Database\Eloquent\Collection;
+        $allItems = $allItems->concat($sentChats);
+        $allItems = $allItems->concat($receivedChats);
+
+        //sort the objects by date
+        $sorted = $allItems->values()->sortBy('created_at');
+
+        $sorted->sort(function ($a, $b) {
+            if ($a->total === $b->total) {
+                return strtotime($a->created_at) < strtotime($b->created_at);
+            }
+        
+            return $a->total < $b->total;
+        });
+
+        return view('healthworker/personal-chat', ['patient' => $patient, 'chats' => $sorted]);   
+    }
+
+    public function sendChat(Request $request){
+    //validate all fields
+    $this->validate($request, [
+    'message' => 'required',
+    'p_id' => 'required',
+    ]);
+    
+    $recId = $request->input('p_id');
+
+    $chat = new Chat;
+    $chat->rec_id = $recId; 
+    $chat->message = $request->input('message');
+    $chat->send_id = Auth::id();
+
+    if($chat->save())
+       return redirect()->route('hw_chat_patient', ['pid' => $recId])->with('success', 'SENT');
+  
     }
 
 }

@@ -16,7 +16,7 @@
     </div>
 
 </div>
-
+<br>
 <div class="container-fluid table-responsive">
     <input class="form-control" id="hayokInput" type="text" placeholder="Search..">
     <br>
@@ -196,4 +196,8 @@
       });
     });
     </script>
+
+    <div class="d-flex justify-content-center">
+        {!! $patients->links() !!}
+    </div>
 @endsection
