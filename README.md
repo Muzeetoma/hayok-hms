@@ -10,6 +10,12 @@ I have created seeders for the dummy healthworkers data in database/UsersTableSe
 Each user(health worker and patient) have login details(email and password)<br>
 which are their 'names'@gmail.com e.g idris@gmail.com<br>
 all passwords are '12345'
+<br>    
+when a health worker registers a patient, his password is '12345' as default e.g hunter@gmail.com with password 12345 is a patient
 <br>
+The program determines what dashboard to open after successful login by the user(health worker and patient)   
+<br>
+All routes are protected by middlewares to avoid patient accessing healthworkers page and vice versa
+ <br>   
 All functionalities as well as proper commenting have been completed...
 </p>
