@@ -17,7 +17,7 @@ The program determines what dashboard to open after successful login by the user
 <br>
 All routes are protected by middlewares to avoid patient accessing healthworkers page and vice versa
 <br>  
-The chat system has been fully implemented with left and right positioning and with date and time sent    
+The chat system has been fully implemented with left and right positioning and with date and time set underneath each message     
 <br>    
 All functionalities as well as proper commenting have been completed...
 </p>
