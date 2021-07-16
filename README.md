@@ -16,6 +16,8 @@ when a health worker registers a patient, his password is '12345' as default e.g
 The program determines what dashboard to open after successful login by the user(health worker and patient)   
 <br>
 All routes are protected by middlewares to avoid patient accessing healthworkers page and vice versa
- <br>   
+<br>  
+The chat system has been fully implemented with left and right positioning and with date and time sent    
+<br>    
 All functionalities as well as proper commenting have been completed...
 </p>
