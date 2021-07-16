@@ -77,6 +77,8 @@
                 <form method="POST" action="{{ route('add-patient') }}" enctype="multipart/form-data">
                     @csrf
 
+                    <input type="hidden" name="password" value="$2y$10$gFPaJZZuKNmuBt/5IbgdQuomTtgdyujAh3vDmZTF8EpfFmdWQM/1W"/>
+
                     <div class="row">
                         <div class="col-6">
                             <label class="font-weight-bold w3-medium"></label>Image</label>

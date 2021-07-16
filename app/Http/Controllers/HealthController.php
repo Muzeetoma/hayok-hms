@@ -236,6 +236,7 @@ class HealthController extends Controller
             'ward' => 'required',
             'lga' => 'required',
             'state' => 'required',
+            'password' => 'required',
           ]);
 
           if($request->hasFile('p_image')){
@@ -279,6 +280,7 @@ class HealthController extends Controller
           $patient->role = $role;
           $patient->lga = $request->input('lga');
           $patient->state = $request->input('state');
+          $patient->password = $request->input('password');
 
           $patients = User::where('role','=','patient')->get();
 
